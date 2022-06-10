@@ -50,6 +50,15 @@
 			/* don't consume click events - make children visible explicitly */
 			visibility: hidden;
 		}
+		
+		#status::after {
+			content: url("index.png");
+			position: absolute;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+		}
 
 		#status-progress {
 			width: 366px;
