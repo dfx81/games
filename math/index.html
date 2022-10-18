@@ -50,17 +50,8 @@
 			/* don't consume click events - make children visible explicitly */
 			visibility: hidden;
 		}
-		
-		#status-splash {
-			width: auto;
-			max-height: 100%;
-			object-fit: contain;
-			visibility: visible;
-		}
 
 		#status-progress {
-			position: absolute;
-			bottom: 16px;
 			width: 366px;
 			height: 7px;
 			background-color: #38363A;
@@ -89,6 +80,7 @@
 		}
 
 		#status-indeterminate {
+			height: 42px;
 			visibility: visible;
 			position: relative;
 		}
@@ -123,7 +115,6 @@
 <link id='-gd-engine-icon' rel='icon' type='image/png' href='index.icon.png' />
 <link rel='apple-touch-icon' href='index.apple-touch-icon.png'/>
 <link rel='manifest' href='index.manifest.json'>
-<script type='application/javascript'>window.addEventListener('load', () => {if ('serviceWorker' in navigator) {navigator.serviceWorker.register('index.service.worker.js');}});</script>
 <script>
 	#canvas {
 		margin: 0px auto;
@@ -136,7 +127,6 @@
 		Please try updating or use a different browser.
 	</canvas>
 	<div id='status'>
-		<img id='status-splash' style='display: none;' oncontextmenu='event.preventDefault();' src='index.png' alt='splash screen'>
 		<div id='status-progress' style='display: none;' oncontextmenu='event.preventDefault();'><div id ='status-progress-inner'></div></div>
 		<div id='status-indeterminate' style='display: none;' oncontextmenu='event.preventDefault();'>
 			<div></div>
@@ -154,13 +144,12 @@
 	<script type='text/javascript' src='index.js'></script>
 	<script type='text/javascript'>//<![CDATA[
 
-		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":5764800,"index.wasm":13342674},"focusCanvas":true,"gdnativeLibs":[]};
+		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":5772784,"index.wasm":17862218},"focusCanvas":true,"gdnativeLibs":[],"serviceWorker":"index.service.worker.js"};
 		var engine = new Engine(GODOT_CONFIG);
 
 		(function() {
 			const INDETERMINATE_STATUS_STEP_MS = 100;
 			var statusProgress = document.getElementById('status-progress');
-			var statusSplash = document.getElementById('status-splash');
 			var statusProgressInner = document.getElementById('status-progress-inner');
 			var statusIndeterminate = document.getElementById('status-indeterminate');
 			var statusNotice = document.getElementById('status-notice');
@@ -179,7 +168,7 @@
 
 				if (statusMode === mode || !initializing)
 					return;
-				[statusProgress, statusIndeterminate, statusNotice, statusSplash].forEach(elem => {
+				[statusProgress, statusIndeterminate, statusNotice].forEach(elem => {
 					elem.style.display = 'none';
 				});
 				animationCallbacks = animationCallbacks.filter(function(value) {
@@ -188,7 +177,6 @@
 				switch (mode) {
 					case 'progress':
 						statusProgress.style.display = 'block';
-						statusSplash.style.display = 'block';
 						break;
 					case 'indeterminate':
 						statusIndeterminate.style.display = 'block';
