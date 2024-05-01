@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://cn0s07wciifvl"
-path="res://.godot/imported/LexendDeca-VariableFont_wght.ttf-656b5fcd63b6a42b57cca216f4bec611.fontdata"
+path="res://.godot/imported/LexendDeca-VariableFont_wght.ttf-a4a855b691a784322f7dab6cfd643a35.fontdata"
 
 [deps]
 
-source_file="res://exports/html5/res/fonts/Lexend_Deca/LexendDeca-VariableFont_wght.ttf"
-dest_files=["res://.godot/imported/LexendDeca-VariableFont_wght.ttf-656b5fcd63b6a42b57cca216f4bec611.fontdata"]
+source_file="res://assets/html/res/fonts/Lexend_Deca/LexendDeca-VariableFont_wght.ttf"
+dest_files=["res://.godot/imported/LexendDeca-VariableFont_wght.ttf-a4a855b691a784322f7dab6cfd643a35.fontdata"]
 
 [params]
 
