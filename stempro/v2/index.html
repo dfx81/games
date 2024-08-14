@@ -144,10 +144,12 @@
 			visibility: visible;
 		}
 	</style>
+<link id='-gd-engine-icon' rel='icon' type='image/png' href='index.icon.png' />
+<link rel='apple-touch-icon' href='index.apple-touch-icon.png'/>
 
 </head>
 <body>
-	<canvas id='canvas' width="1280" height="720">
+	<canvas id='canvas'>
 		HTML5 canvas appears to be unsupported in the current browser.<br />
 		Please try updating or use a different browser.
 	</canvas>
@@ -165,6 +167,7 @@
 		</div>
 		<div id='status-notice' class='godot' style='display: none;'></div>
 	</div>
+
 	<div id="fill">
 		<input type="button" value="PLAY" onclick="play()" id="play-btn">
 		<span id="landscape-only">Please rotate the screen.</span>
@@ -172,14 +175,14 @@
 
 	<script type='text/javascript' src='index.js'></script>
 	<script type='text/javascript'>//<![CDATA[
-
 		function play() {
 			let canvas = document.getElementById("canvas");
-			canvas.requestFullscreen();
-			screen.orientation.lock("landscape");
+			canvas.requestFullscreen().then(() => {
+				screen.orientation.lock("landscape");
+			});
 		}
-
-		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":364080,"index.wasm":17865444},"focusCanvas":true,"gdnativeLibs":[]};
+		
+		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":365792,"index.wasm":17865444},"focusCanvas":true,"gdnativeLibs":[]};
 		var engine = new Engine(GODOT_CONFIG);
 
 		(function() {
@@ -221,7 +224,6 @@
 						statusNotice.style.display = 'block';
 						break;
 					case 'hidden':
-						document.getElementById("fill").style.visibility = "visible";
 						break;
 					default:
 						throw new Error('Invalid status mode');
