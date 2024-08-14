@@ -15,6 +15,19 @@
 			background-color: black;
 		}
 
+		#fill {
+			background-color: black;
+			position: absolute;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			pointer-events: all;
+		}
+
 		#canvas {
 			display: block;
 			margin: 0;
@@ -115,7 +128,7 @@
 
 </head>
 <body>
-	<canvas id='canvas'>
+	<canvas id='canvas' width="1280" height="720">
 		HTML5 canvas appears to be unsupported in the current browser.<br />
 		Please try updating or use a different browser.
 	</canvas>
@@ -133,9 +146,18 @@
 		</div>
 		<div id='status-notice' class='godot' style='display: none;'></div>
 	</div>
+	<div id="fill">
+		<input type="button" value="PLAY" onclick="play()">
+	</div>
 
 	<script type='text/javascript' src='index.js'></script>
 	<script type='text/javascript'>//<![CDATA[
+
+		function play() {
+			let canvas = document.getElementById("canvas");
+			canvas.requestFullscreen();
+			screen.orientation.lock("landscape");
+		}
 
 		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":364080,"index.wasm":17865444},"focusCanvas":true,"gdnativeLibs":[]};
 		var engine = new Engine(GODOT_CONFIG);
