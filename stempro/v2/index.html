@@ -177,8 +177,7 @@
 	<script type='text/javascript'>//<![CDATA[
 		screen.orientation.addEventListener("change", () => {
 			if (screen.orientation.type.includes("portrait")) {
-				let canvas = document.getElementById("canvas");
-				canvas.exitFullscreen();
+				document.exitFullscreen();
 			}
 		});
 
