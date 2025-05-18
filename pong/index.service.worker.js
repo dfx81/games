@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1747517362|3747833953';
+const CACHE_VERSION = '1747558849|1434274377';
 /** @type {string} */
 const CACHE_PREFIX = 'PeerPong-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
