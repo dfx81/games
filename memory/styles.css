@@ -1,0 +1,239 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  font-family: sans-serif;
+}
+
+html {
+  min-height: 100vh;
+  cursor: pointer;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(#ddd, #333);
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  z-index: 100;
+  font-family: serif;
+  color: #dfdfdf;
+}
+
+.overlay.visible {
+  display: flex;
+  font-size: 5em;
+  animation: overlay-in 0.5s forwards;
+}
+
+.overlay.hidden {
+  animation: overlay-out 0.25s forwards;
+}
+
+.overlay-subtext {
+  font-size: 0.5em;
+}
+
+.overlay.visible .anim {
+  animation: idle-anim 1s linear infinite;
+}
+
+.game-info-container {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.game-info {
+  color: #dfdfdf;
+  font-family: sans-serif;
+  font-size: 1.5em;
+}
+
+.game-board {
+  /*background-color: white;*/
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  grid-gap: 20px;
+  width: 50%;
+  height: 75%;
+  justify-content: center;
+  perspective: 500px;
+  padding: 0;
+  margin: 0;
+}
+
+.card {
+  /*background-color: black;*/
+  width: 5em;
+  height: 6em;
+}
+
+.card:hover {
+  cursor: grab;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card.visible:hover, .card.matched:hover {
+  cursor: not-allowed;
+}
+
+.card-face {
+  position: absolute;
+  width: 5em;
+  height: 6em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  border: solid 1px #818181;
+  transition: border 100ms ease-in-out, transform 250ms ease-in-out;
+}
+
+.card-face:hover {
+  border: solid 1px #dfdfdf;
+}
+
+.card-front {
+  background-color: #666;
+  transform: rotateY(180deg);
+}
+
+.card.visible .card-front {
+  transform: rotateY(0);
+}
+
+.card-back {
+  background-color: #333;
+}
+
+.card.visible .card-back {
+  transform: rotateY(-180deg);
+}
+
+.card-icon, .card-val {
+  font-family: sans-serif;
+  color: #dfdfdf;
+  font-weight: bold;
+  font-size: 3em;
+  transition: font-size 100ms ease-in-out;
+}
+
+/*.card-icon:hover, .card-val:hover {
+  font-size: 3.5em;
+}*/
+
+.card.matched .card-val {
+  animation: jiggle 1s linear infinite 250ms;
+}
+
+@keyframes jiggle {
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.75);
+  }
+}
+
+@keyframes overlay-in {
+  from {
+    background-color: #0000;
+    font-size: 0;
+  }
+
+  to {
+    background-color: #333e;
+    font-size: 5em;
+  }
+}
+
+@keyframes overlay-out {
+  from {
+    background-color: #333e;
+  }
+
+  to {
+    background-color: #0000;
+    color: #0000;
+  }
+}
+
+@keyframes idle-anim {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-board {
+    width: 100%;
+    height: 80%;
+    justify-content: center;
+    grid-gap: 10px;
+  }
+
+  .card {
+    width: 5em;
+    height: 6em;
+  }
+
+  .card-face {
+    width: 5em;
+    height: 6em;
+  }
+
+  @keyframes overlay-in {
+    from {
+      background-color: #0000;
+      font-size: 0;
+    }
+
+    to {
+      background-color: #333e;
+      font-size: 3em;
+    }
+  }
+
+  @keyframes overlay-out {
+    from {
+      background-color: #333e;
+      font-size: 3em;
+    }
+
+    to {
+      background-color: #0000;
+      color: #0000;
+      font-size: 3em;
+    }
+  }
+}
