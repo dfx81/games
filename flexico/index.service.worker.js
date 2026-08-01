@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1785554490|509231343';
+const CACHE_VERSION = '1785564384|29257606';
 /** @type {string} */
 const CACHE_PREFIX = 'flexico-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
