@@ -146,7 +146,7 @@ function getParams() {
     const from = (parts[1] || '').toUpperCase();
     if (/^[A-Z]{5}$/.test(to)) return { answer: to, from: from.slice(0,5) };
   } catch(e) {}
-  return { answer: 'GRACE', from: 'ANON' };
+  return { answer: 'LEMBU', from: 'ANON' };
 }
 
 const { answer: ANSWER, from: FROM } = getParams();
