@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dayble</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100dvh;
+  }
+
+  #header {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+    flex-shrink: 0;
+  }
+
+  #header h1 {
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 4px;
+  }
+
+  #toast {
+    font-size: 12px;
+    font-weight: bold;
+    color: #000;
+    height: 18px;
+    text-align: center;
+    flex-shrink: 0;
+    padding: 2px 0;
+  }
+
+  #board-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+  }
+
+  #board {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .row { display: flex; gap: 4px; }
+
+  .tile {
+    width: var(--tile);
+    height: var(--tile);
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--tile) * 0.45);
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #000;
+    background: #fff;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .tile.filled   { border-color: #999; }
+  .tile.correct  { background: #6aaa64; color: #fff; border-color: #6aaa64; }
+  .tile.present  { background: #c9b458; color: #fff; border-color: #c9b458; }
+  .tile.absent   { background: #787c7e; color: #fff; border-color: #787c7e; }
+  .tile.msg      { background: #6aaa64; color: #fff; border-color: #6aaa64; }
+  .tile.msg-from { background: #c9b458; color: #fff; border-color: #c9b458; }
+  .tile.blank    { background: #d3d6da; border-color: #d3d6da; color: #d3d6da; }
+
+  #keyboard {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 6px 4px 10px;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .kb-row {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+  }
+
+  .key {
+    flex: 1;
+    height: 44px;
+    background: #d3d6da;
+    color: #000;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    border-radius: 3px;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .key.wide { flex: 1.5; font-size: 11px; }
+  .key.correct { background: #6aaa64; color: #fff; }
+  .key.present { background: #c9b458; color: #fff; }
+  .key.absent  { background: #787c7e; color: #fff; }
+
+
+</style>
+</head>
+<body>
+
+<div id="header"><h1>DAYBLE</h1></div>
+<div id="toast"></div>
+<div id="board-wrap"><div id="board"></div></div>
+<div id="keyboard">
+  <div class="kb-row" id="kb-0"></div>
+  <div class="kb-row" id="kb-1"></div>
+  <div class="kb-row" id="kb-2"></div>
+</div>
+
+<script>
+const ROWS = 6, COLS = 5;
+
+function getParams() {
+  try {
+    const parts = atob(location.hash.slice(1)).split('|');
+    const to   = (parts[0] || '').toUpperCase();
+    const from = (parts[1] || '').toUpperCase();
+    if (/^[A-Z]{5}$/.test(to)) return { answer: to, from: from.slice(0,5) };
+  } catch(e) {}
+  return { answer: 'GRACE', from: 'ANON' };
+}
+
+const { answer: ANSWER, from: FROM } = getParams();
+const MESSAGE = ['HAPPY','BIRTH','DAY__', ANSWER.padEnd(5,'_'), 'FROM_', FROM];
+
+const KB = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['ENTER','Z','X','C','V','B','N','M','⌫']
+];
+
+// Set tile size based on available space
+function setTileSize() {
+  const headerH = document.getElementById('header').offsetHeight;
+  const kbH     = document.getElementById('keyboard').offsetHeight;
+  const statusH = 18, toastH = 22;
+  const availH  = window.innerHeight - headerH - kbH - statusH - toastH - 20;
+  const availW  = window.innerWidth - 32;
+  const byH = Math.floor((availH - (ROWS - 1) * 4) / ROWS);
+  const byW = Math.floor((availW - (COLS - 1) * 4) / COLS);
+  const size = Math.min(byH, byW, 62);
+  document.documentElement.style.setProperty('--tile', size + 'px');
+}
+
+let grid = Array.from({length:ROWS}, () => Array(COLS).fill(''));
+let row = 0, col = 0, over = false, keyStates = {};
+
+const board = document.getElementById('board');
+for (let r = 0; r < ROWS; r++) {
+  const rowEl = document.createElement('div');
+  rowEl.className = 'row';
+  for (let c = 0; c < COLS; c++) {
+    const t = document.createElement('div');
+    t.className = 'tile';
+    t.id = `t${r}${c}`;
+    rowEl.appendChild(t);
+  }
+  board.appendChild(rowEl);
+}
+
+KB.forEach((keys, i) => {
+  const rowEl = document.getElementById('kb-'+i);
+  keys.forEach(k => {
+    const btn = document.createElement('button');
+    btn.className = 'key' + (k.length > 1 ? ' wide' : '');
+    btn.textContent = k;
+    btn.addEventListener('click', () => input(k));
+    rowEl.appendChild(btn);
+  });
+});
+
+// Size tiles after keyboard is rendered
+requestAnimationFrame(() => { setTileSize(); });
+window.addEventListener('resize', setTileSize);
+
+function tile(r, c) { return document.getElementById(`t${r}${c}`); }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.textContent = '', 1500);
+}
+
+function input(k) {
+  if (over) return;
+  if (k === '⌫' || k === 'Backspace') {
+    if (col > 0) {
+      col--;
+      grid[row][col] = '';
+      const t = tile(row, col);
+      t.textContent = '';
+      t.classList.remove('filled');
+    }
+  } else if (k === 'ENTER' || k === 'Enter') {
+    submit();
+  } else if (/^[A-Za-z]$/.test(k) && col < COLS) {
+    grid[row][col] = k.toUpperCase();
+    const t = tile(row, col);
+    t.textContent = k.toUpperCase();
+    t.classList.add('filled');
+    col++;
+  }
+}
+
+function submit() {
+  if (col < COLS) { toast('Not enough letters'); return; }
+  const guess = grid[row].join('');
+  const result = evaluate(guess);
+  const priority = { correct:3, present:2, absent:1 };
+
+  result.forEach((state, c) => {
+    setTimeout(() => {
+      const t = tile(row, c);
+      t.classList.remove('filled');
+      t.classList.add(state);
+      const letter = guess[c];
+      if (!keyStates[letter] || priority[state] > priority[keyStates[letter]]) {
+        keyStates[letter] = state;
+        document.querySelectorAll('.key').forEach(btn => {
+          if (btn.textContent === letter) {
+            btn.classList.remove('correct','present','absent');
+            btn.classList.add(state);
+          }
+        });
+      }
+    }, c * 150);
+  });
+
+  setTimeout(() => {
+    const won = result.every(s => s === 'correct');
+    if (won) {
+      over = true;
+      setTimeout(() => reveal(), 300);
+    } else if (row === ROWS - 1) {
+      over = true;
+      toast(`The word was ${ANSWER}`);
+      setTimeout(() => reveal(), 1800);
+    } else {
+      row++; col = 0;
+    }
+  }, COLS * 150 + 100);
+}
+
+function evaluate(guess) {
+  const res = Array(COLS).fill('absent');
+  const ans = ANSWER.split(''), used = Array(COLS).fill(false);
+  guess.split('').forEach((l,i) => { if (l===ans[i]) { res[i]='correct'; used[i]=true; } });
+  guess.split('').forEach((l,i) => {
+    if (res[i]==='correct') return;
+    const j = ans.findIndex((a,ai) => a===l && !used[ai]);
+    if (j!==-1) { res[i]='present'; used[j]=true; }
+  });
+  return res;
+}
+
+function reveal() {
+  const rowColors = ['msg','msg','msg','msg','msg-from','msg-from'];
+  let delay = 0;
+  for (let r = 0; r < ROWS; r++) {
+    const word = MESSAGE[r];
+    const cls  = rowColors[r];
+    for (let c = 0; c < COLS; c++) {
+      const letter = word[c] || '_';
+      const tileClass = letter === '_' ? 'blank' : cls;
+      setTimeout(() => {
+        const t = tile(r, c);
+        t.className = 'tile ' + tileClass;
+        t.textContent = letter === '_' ? '' : letter;
+      }, delay + c * 80);
+    }
+    delay += COLS * 80 + 120;
+  }
+
+}
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  input(e.key);
+});
+</script>
+</body>
+</html>
